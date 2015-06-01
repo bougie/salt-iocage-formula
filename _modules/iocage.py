@@ -72,6 +72,30 @@ def list_properties(jail_name, **kwargs):
         return '\n'.join([_.replace(':', '=', 1) for _ in props])
 
 
+def get_property(property_name, jail_name, **kwargs):
+    '''
+    Get property value for a given jail (or default value)
+
+    CLI Example:
+
+    .. code-block:: bash
+
+        salt '*' iocage.get_property <property> <jail_name>
+        salt '*' iocage.get_property <property> defaults
+    '''
+
+    if property_name == 'all':
+        return list_properties(jail_name, **kwargs)
+    else:
+        cmd = 'iocage get %s %s' % (property_name, jail_name)
+        cmd_ret = __salt__['cmd.run_all'](cmd)
+        if cmd_ret['retcode'] == 0:
+            return cmd_ret['stdout']
+        else:
+            raise CommandExecutionError(
+                'Error in command "%s" : %s' % (cmd, str(cmd_ret)))
+
+
 if __name__ == "__main__":
     __salt__ = ''
 
