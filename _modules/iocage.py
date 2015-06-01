@@ -10,7 +10,7 @@ from __future__ import absolute_import
 import logging
 # Import salt libs
 import salt.utils
-from salt.exceptions import CommandExecutionError  # , SaltInvocationError
+from salt.exceptions import CommandExecutionError, SaltInvocationError
 
 log = logging.getLogger(__name__)
 
@@ -54,6 +54,56 @@ def _list_properties(jail_name, **kwargs):
         cmd = 'iocage get all %s' % (jail_name,)
 
     return _exec(cmd).split('\n')
+
+
+def _list(option=None, **kwargs):
+    if option not in [None, '-t', '-r']:
+        raise SaltInvocationError('Bad option name in command _list')
+
+    cmd = 'iocage list'
+    if option == '-t' or option == '-r':
+        cmd = '%s %s' % (cmd, option)
+    lines = _exec(cmd, **kwargs).split('\n')
+
+    if len(lines) > 0:
+        if option == '-r':
+            headers = ['RELEASE']
+        else:
+            headers = [_ for _ in lines[0].split(' ') if len(_) > 0]
+
+        jails = []
+        if len(lines) > 1:
+            for l in lines[1:]:
+                jails.append({
+                    headers[k]: v for k, v in enumerate([_ for _ in l.split(' ')
+                                                         if len(_) > 0])
+                })
+
+        return jails
+    else:
+        raise CommandExecutionError(
+            'Error in command "%s" : no results found' % (cmd, ))
+
+
+def _display_list(items_list):
+    ret = ''
+
+    for item in items_list:
+        ret += '%s\n' % (','.join(['%s=%s' % (k, v) for k, v in item.items()]),)
+
+    return ret
+
+
+def list_jails(**kwargs):
+    return _display_list(_list())
+
+
+def list_templates(**kwargs):
+    return _display_list(_list('-t'))
+
+
+def list_releases(**kwargs):
+    return _display_list(_list('-r'))
 
 
 def list_properties(jail_name, **kwargs):
