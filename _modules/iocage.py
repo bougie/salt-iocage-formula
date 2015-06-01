@@ -34,6 +34,15 @@ def _option_exists(name, **kwargs):
     return name in list_properties(name, **kwargs)
 
 
+def _exec(cmd, output='stdout'):
+    cmd_ret = __salt__['cmd.run_all'](cmd)
+    if cmd_ret['retcode'] == 0:
+        return cmd_ret[output]
+    else:
+        raise CommandExecutionError(
+            'Error in command "%s" : %s' % (cmd, str(cmd_ret)))
+
+
 def _list_properties(jail_name, **kwargs):
     '''
     Returns result of iocage get all or iocage defaults (according to the
@@ -44,12 +53,7 @@ def _list_properties(jail_name, **kwargs):
     else:
         cmd = 'iocage get all %s' % (jail_name,)
 
-    cmd_ret = __salt__['cmd.run_all'](cmd)
-    if cmd_ret['retcode'] == 0:
-        return cmd_ret['stdout'].split('\n')
-    else:
-        raise CommandExecutionError(
-            'Error in command "%s" : %s' % (cmd, str(cmd_ret)))
+    return _exec(cmd).split('\n')
 
 
 def list_properties(jail_name, **kwargs):
@@ -87,13 +91,7 @@ def get_property(property_name, jail_name, **kwargs):
     if property_name == 'all':
         return list_properties(jail_name, **kwargs)
     else:
-        cmd = 'iocage get %s %s' % (property_name, jail_name)
-        cmd_ret = __salt__['cmd.run_all'](cmd)
-        if cmd_ret['retcode'] == 0:
-            return cmd_ret['stdout']
-        else:
-            raise CommandExecutionError(
-                'Error in command "%s" : %s' % (cmd, str(cmd_ret)))
+        return _exec('iocage get %s %s' % (property_name, jail_name))
 
 
 if __name__ == "__main__":
