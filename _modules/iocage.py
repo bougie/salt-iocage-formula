@@ -57,6 +57,9 @@ def _list_properties(jail_name, **kwargs):
 
 
 def _list(option=None, **kwargs):
+    '''
+    Returns list of jails, templates or releases
+    '''
     if option not in [None, '-t', '-r']:
         raise SaltInvocationError('Bad option name in command _list')
 
@@ -86,6 +89,9 @@ def _list(option=None, **kwargs):
 
 
 def _display_list(items_list):
+    '''
+    Format display for the list of jails, templates or releases
+    '''
     ret = ''
 
     for item in items_list:
@@ -95,14 +101,41 @@ def _display_list(items_list):
 
 
 def list_jails(**kwargs):
+    '''
+    Get list of jails
+
+    CLI Example:
+
+    .. code-block:: bash
+
+        salt '*' iocage.list_jails
+    '''
     return _display_list(_list())
 
 
 def list_templates(**kwargs):
+    '''
+    Get list of template jails
+
+    CLI Example:
+
+    .. code-block:: bash
+
+        salt '*' iocage.list_templates
+    '''
     return _display_list(_list('-t'))
 
 
 def list_releases(**kwargs):
+    '''
+    Get list of downloaded releases
+
+    CLI Example:
+
+    .. code-block:: bash
+
+        salt '*' iocage.list_releases
+    '''
     return _display_list(_list('-r'))
 
 
@@ -137,7 +170,6 @@ def get_property(property_name, jail_name, **kwargs):
         salt '*' iocage.get_property <property> <jail_name>
         salt '*' iocage.get_property <property> defaults
     '''
-
     if property_name == 'all':
         return list_properties(jail_name, **kwargs)
     else:
