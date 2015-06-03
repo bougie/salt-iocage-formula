@@ -100,6 +100,28 @@ def _display_list(items_list):
     return ret
 
 
+def _manage_state(state, jail_name, **kwargs):
+    '''
+    Start / Stop / Reboot a jail
+    '''
+    existing_jails = _list()
+    for jail in existing_jails:
+        if jail_name == jail['UUID'] or jail_name == jail['TAG']:
+            if ((state == 'start' and jail['STATE'] == 'down')
+                    or (state == 'stop' and jail['STATE'] == 'up')
+                    or state == 'restart'):
+                return _exec('iocage %s %s' % (state, jail_name))
+            else:
+                if state == 'start':
+                    raise SaltInvocationError(
+                        'jail %s is already started' % (jail_name,))
+                else:
+                    raise SaltInvocationError(
+                        'jail %s is already stoped' % (jail_name,))
+
+    raise SaltInvocationError('jail uuid or tag does not exist' % (jail_name,))
+
+
 def list_jails(**kwargs):
     '''
     Get list of jails
@@ -207,6 +229,45 @@ def create(option=None, **kwargs):
     else:
         cmd = 'iocage create %s' % (properties,)
     return _exec(cmd)
+
+
+def start(jail_name, **kwargs):
+    '''
+    Start a jail
+
+    CLI Example:
+
+    .. code-block:: bash
+
+        salt '*' iocage.start <jail_name>
+    '''
+    return _manage_state('start', jail_name, **kwargs)
+
+
+def stop(jail_name, **kwargs):
+    '''
+    Stop a jail
+
+    CLI Example:
+
+    .. code-block:: bash
+
+        salt '*' iocage.stop <jail_name>
+    '''
+    return _manage_state('stop', jail_name, **kwargs)
+
+
+def restart(jail_name, **kwargs):
+    '''
+    Restart a jail
+
+    CLI Example:
+
+    .. code-block:: bash
+
+        salt '*' iocage.restart <jail_name>
+    '''
+    return _manage_state('restart', jail_name, **kwargs)
 
 
 if __name__ == "__main__":
