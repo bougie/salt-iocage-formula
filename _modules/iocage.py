@@ -176,6 +176,39 @@ def get_property(property_name, jail_name, **kwargs):
         return _exec('iocage get %s %s' % (property_name, jail_name))
 
 
+def create(option=None, **kwargs):
+    '''
+    Create a new jail
+
+    CLI Example:
+
+    .. code-block:: bash
+
+        salt '*' iocage.create [<option>] [<property=value>]
+    '''
+    _options = [None, 'clone', 'base']
+
+    if option not in _options:
+        raise SaltInvocationError('Unknown option %s' % (option,))
+
+    # stringify the kwargs dict into iocage create properties format
+    properties = ' '.join(['%s=%s' % (k, v) for k, v in kwargs.items()])
+
+    # if we would like to specify a tag value for the jail
+    # check if another jail have not the same tag
+    if 'tag' in kwargs.keys():
+        existing_jails = _list()
+        if kwargs['tag'] in [k['TAG'] for k in existing_jails]:
+            raise SaltInvocationError(
+                'Tag %s already exists' % (kwargs['tag'],))
+
+    if option is not None and len(properties) > 0:
+        cmd = 'iocage create %s %s' % (option, properties)
+    else:
+        cmd = 'iocage create %s' % (properties,)
+    return _exec(cmd)
+
+
 if __name__ == "__main__":
     __salt__ = ''
 
