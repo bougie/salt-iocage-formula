@@ -102,14 +102,15 @@ def _display_list(items_list):
 
 def _manage_state(state, jail_name, **kwargs):
     '''
-    Start / Stop / Reboot a jail
+    Start / Stop / Reboot / Destroy a jail
     '''
     existing_jails = _list()
     for jail in existing_jails:
         if jail_name == jail['UUID'] or jail_name == jail['TAG']:
             if ((state == 'start' and jail['STATE'] == 'down')
                     or (state == 'stop' and jail['STATE'] == 'up')
-                    or state == 'restart'):
+                    or state == 'restart'
+                    or state == 'destroy'):
                 return _exec('iocage %s %s' % (state, jail_name))
             else:
                 if state == 'start':
@@ -268,6 +269,19 @@ def restart(jail_name, **kwargs):
         salt '*' iocage.restart <jail_name>
     '''
     return _manage_state('restart', jail_name, **kwargs)
+
+
+def destroy(jail_name, **kwargs):
+    '''
+    Destroy a jail
+
+    CLI Example:
+
+    .. code-block:: bash
+
+        salt '*' iocage.destroy <jail_name>
+    '''
+    return _manage_state('destroy', jail_name, **kwargs)
 
 
 if __name__ == "__main__":
