@@ -56,6 +56,17 @@ def _list_properties(jail_name, **kwargs):
     return _exec(cmd).split('\n')
 
 
+def _parse_properties(**kwargs):
+    default_properties = [p.split('=')[0] for p in _list_properties('defaults')]
+
+    for prop in kwargs.keys():
+        if not prop.startswith('__') and prop not in default_properties:
+            raise SaltInvocationError('Unknown property %s' % (prop,))
+
+    return ' '.join(
+        ['%s=%s' % (k, v) for k, v in kwargs.items() if not k.startswith('__')])
+
+
 def _list(option=None, **kwargs):
     '''
     Returns list of jails, templates or releases
@@ -215,7 +226,7 @@ def create(option=None, **kwargs):
         raise SaltInvocationError('Unknown option %s' % (option,))
 
     # stringify the kwargs dict into iocage create properties format
-    properties = ' '.join(['%s=%s' % (k, v) for k, v in kwargs.items()])
+    properties = _parse_properties(**kwargs)
 
     # if we would like to specify a tag value for the jail
     # check if another jail have not the same tag
