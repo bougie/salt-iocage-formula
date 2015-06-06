@@ -210,6 +210,19 @@ def get_property(property_name, jail_name, **kwargs):
         return _exec('iocage get %s %s' % (property_name, jail_name))
 
 
+def set_property(jail_name, **kwargs):
+    '''
+    Set property value for a given jail
+
+    CLI Example:
+
+    .. code-block:: bash
+
+        salt '*' iocage.set_property <jail_name> [<property=value>]
+    '''
+    return _exec('iocage set %s %s' % (_parse_properties(**kwargs), jail_name))
+
+
 def create(option=None, **kwargs):
     '''
     Create a new jail
