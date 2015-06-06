@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 '''
-Support for iocage (jails tooks on FreeBSD)
+Support for iocage (jails tools on FreeBSD)
 '''
 from __future__ import absolute_import
 
