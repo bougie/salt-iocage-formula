@@ -266,6 +266,11 @@ def create(option=None, **kwargs):
             raise SaltInvocationError(
                 'Tag %s already exists' % (kwargs['tag'],))
 
+    # fetch a release if it's the first install
+    existing_release = list_releases()
+    if len(existing_release) == 0:
+        fetch()
+
     if option is not None and len(properties) > 0:
         cmd = 'iocage create %s %s' % (option, properties)
     else:
