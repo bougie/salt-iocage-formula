@@ -223,6 +223,23 @@ def set_property(jail_name, **kwargs):
     return _exec('iocage set %s %s' % (_parse_properties(**kwargs), jail_name))
 
 
+def fetch(release=None, **kwargs):
+    '''
+    Download or update/patch release
+
+    CLI Example:
+
+    .. code-block:: bash
+
+        salt '*' iocage.fetch
+        salt '*' iocage.fetch <release>
+    '''
+    if release is None:
+        return _exec('iocage fetch')
+    else:
+        return _exec('iocage fetch release=%s' % (release,))
+
+
 def create(option=None, **kwargs):
     '''
     Create a new jail
