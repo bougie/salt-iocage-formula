@@ -22,6 +22,6 @@ Manage freebsd jails:
 
 - fetch a release
 - create a jail
-- start / stop / restart a jail
+- start / stop / restart / destroy a jail
 - list jails / release / templates
 - list / get / set jail properties
