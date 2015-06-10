@@ -2,3 +2,4 @@
 
 include:
     - iocage.install
+    - iocage.config

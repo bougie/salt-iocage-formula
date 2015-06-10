@@ -1,0 +1,6 @@
+iocage:
+    defaults:
+        <propertiy_name>: <property_value>
+    jails:
+        <jail_tagname>:
+            <property_name>: <property_value>
