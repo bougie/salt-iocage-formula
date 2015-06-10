@@ -205,18 +205,12 @@ def get_property(property_name, jail_name, **kwargs):
         salt '*' iocage.get_property <property> defaults
     '''
     if jail_name == 'defaults':
-        values = list_properties('defaults', **kwargs).split('\n')
-        for value in values:
-            if value.split('=')[0] == property_name:
-                return value.split('=')[1]
+        jail_name = 'default'
 
-        raise SaltInvocationError(
-            'unable to get default property %s' % (property_name,))
+    if property_name == 'all':
+        return list_properties(jail_name, **kwargs)
     else:
-        if property_name == 'all':
-            return list_properties(jail_name, **kwargs)
-        else:
-            return _exec('iocage get %s %s' % (property_name, jail_name))
+        return _exec('iocage get %s %s' % (property_name, jail_name))
 
 
 def set_property(jail_name, **kwargs):
@@ -229,6 +223,9 @@ def set_property(jail_name, **kwargs):
 
         salt '*' iocage.set_property <jail_name> [<property=value>]
     '''
+    if jail_name == 'defaults':
+        jail_name = 'default'
+
     return _exec('iocage set %s %s' % (_parse_properties(**kwargs), jail_name))
 
 
