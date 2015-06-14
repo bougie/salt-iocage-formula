@@ -103,12 +103,12 @@ def _display_list(items_list):
     '''
     Format display for the list of jails, templates or releases
     '''
-    ret = ''
+    ret = []
 
     for item in items_list:
-        ret += '%s\n' % (','.join(['%s=%s' % (k, v) for k, v in item.items()]),)
+        ret.append(','.join(['%s=%s' % (k, v) for k, v in item.items()]),)
 
-    return ret
+    return '\n'.join(ret)
 
 
 def _manage_state(state, jail_name, **kwargs):
