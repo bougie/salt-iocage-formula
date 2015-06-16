@@ -79,7 +79,6 @@ def managed(name, properties=None, **kwargs):
         if __opts__['test']:
             ret['result'] = None
         ret['comment'] = 'unable to check if jail exists or not'
-        ret['comment'] += ' - ' + str(jails)
 
         return ret
 
