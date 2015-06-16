@@ -65,6 +65,8 @@ def managed(name, properties=None, **kwargs):
            'comment': '',
            'result': False}
 
+    # test if a jail already exists
+    # if it does not exist, a create command will be launch
     try:
         jail_exists = False
 
@@ -125,7 +127,7 @@ def managed(name, properties=None, **kwargs):
                     else:
                         ret['result'] = True
             else:
-                ret['comment'] = 'New jail %s installed' % (name,)
+                # install / create the jail
                 try:
                     if not __opts__['test']:
                         if properties is not None:
@@ -134,11 +136,13 @@ def managed(name, properties=None, **kwargs):
                             __salt__['iocage.create'](tag=name, **kwargs)
                 except:
                     ret['result'] = False
+                    ret['comment'] = 'fail installing new jail %s' % (name,)
                 else:
                     if __opts__['test']:
                         ret['result'] = None
                     else:
                         ret['result'] = True
+                    ret['comment'] = 'New jail %s installed' % (name,)
 
     return ret
 

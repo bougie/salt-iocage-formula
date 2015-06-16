@@ -19,7 +19,7 @@ __virtualname__ = 'iocage'
 
 def __virtual__():
     '''
-    Module load only if php is installed
+    Module load only if iocage is installed
     '''
     if salt.utils.which('iocage'):
         return __virtualname__
@@ -29,12 +29,16 @@ def __virtual__():
 
 def _option_exists(name, **kwargs):
     '''
-    Check if a given property is in the all properties list
+    Check if a given property `name` is in the all properties list
     '''
     return name in list_properties(name, **kwargs)
 
 
 def _exec(cmd, output='stdout'):
+    '''
+    Execute commad `cmd` and returns output `output` (by default returns the
+    stdout)
+    '''
     cmd_ret = __salt__['cmd.run_all'](cmd)
     if cmd_ret['retcode'] == 0:
         return cmd_ret[output]
@@ -57,6 +61,10 @@ def _list_properties(jail_name, **kwargs):
 
 
 def _parse_properties(**kwargs):
+    '''
+    Returns a rendered properties string used by iocage command line properties
+    argument
+    '''
     default_properties = [p.split('=')[0] for p in _list_properties('defaults')]
 
     for prop in kwargs.keys():
@@ -69,9 +77,11 @@ def _parse_properties(**kwargs):
 
 def _list(option=None, **kwargs):
     '''
-    Returns list of jails, templates or releases
+    Returns list of jails, templates or releases.
+    `Option` can be None or '' for jails list, '-t' for templates or '-r'
+    for downloaded releases
     '''
-    if option not in [None, '-t', '-r']:
+    if option not in [None, '', '-t', '-r']:
         raise SaltInvocationError('Bad option name in command _list')
 
     cmd = 'iocage list'
@@ -113,7 +123,7 @@ def _display_list(items_list):
 
 def _manage_state(state, jail_name, **kwargs):
     '''
-    Start / Stop / Reboot / Destroy a jail
+    Start / Stop / Reboot / Destroy a jail `jail_name`
     '''
     existing_jails = _list()
     for jail in existing_jails:
