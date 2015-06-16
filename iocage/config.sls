@@ -11,12 +11,12 @@ iocage_{{property_name}}_default_property:
 
 {% if rawmap.jails is defined %}
     {% for jail_name, properties in rawmap.jails.items() %}
+iocage_{{jail_name}}_jail:
+    iocage.managed:
+        - name: {{jail_name}}
+        - properties:
         {% for property_name, property_value in properties.items() %}
-iocage_{{property_name}}_{{jail_name}}_jail_property:
-    iocage.property:
-        - name: {{property_name}}
-        - value: "{{property_value}}"
-        - jail: {{jail_name}}
+            {{property_name}}: "{{property_value}}"
         {% endfor %}
     {% endfor %}
 {% endif %}

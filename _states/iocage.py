@@ -59,6 +59,91 @@ def property(name, value, jail=None, **kwargs):
         return _property(name, value, jail, **kwargs)
 
 
+def managed(name, properties=None, **kwargs):
+    ret = {'name': name,
+           'changes': {},
+           'comment': '',
+           'result': False}
+
+    try:
+        jail_exists = False
+
+        jails = __salt__['iocage.list_jails']().split('\n')
+        for jail in jails:
+            jail_datas = {j.split('=')[0]: '='.join(j.split('=')[1:])
+                          for j in jail.split(',')}
+            if jail_datas['TAG'] == name or jail_datas['UUID'] == name:
+                jail_exists = True
+                break
+    except:
+        if __opts__['test']:
+            ret['result'] = None
+        ret['comment'] = 'unable to check if jail exists or not'
+        ret['comment'] += ' - ' + str(jails)
+
+        return ret
+
+    try:
+        # get jail's properties if exists or defaults
+        if jail_exists:
+            _name = name
+        else:
+            _name = 'defaults'
+        jail_properties = __salt__['iocage.list_properties'](_name, **kwargs)
+    except:
+        jail_properties = None
+    finally:
+        if (jail_properties is not None
+                and properties is not None
+                and len(properties) > 0):
+            jail_properties = {prop.split('=')[0]: '='.join(prop.split('=')[1:])
+                               for prop in jail_properties.split('\n')}
+            if jail_exists:
+                # set new value for each property
+                try:
+                    changes = {}
+                    for prop_name, prop_value in properties.items():
+                        if prop_name in jail_properties.keys():
+                            if prop_value != jail_properties[prop_name]:
+                                changes[prop_name] = {
+                                    'new': prop_value,
+                                    'old': jail_properties[prop_name]}
+
+                                __salt__['iocage.set_property'](
+                                    name,
+                                    **{prop_name: prop_value})
+                    if len(changes) > 0:
+                        ret['changes'] = changes
+                        ret['comment'] = 'updating %s\'s jail properties' % (
+                            name,)
+                    else:
+                        ret['comment'] = 'no change have to be done'
+                except:
+                    ret['result'] = False
+                else:
+                    if __opts__['test']:
+                        ret['result'] = None
+                    else:
+                        ret['result'] = True
+            else:
+                ret['comment'] = 'New jail %s installed' % (name,)
+                try:
+                    if not __opts__['test']:
+                        if properties is not None:
+                            __salt__['iocage.create'](tag=name, **properties)
+                        else:
+                            __salt__['iocage.create'](tag=name, **kwargs)
+                except:
+                    ret['result'] = False
+                else:
+                    if __opts__['test']:
+                        ret['result'] = None
+                    else:
+                        ret['result'] = True
+
+    return ret
+
+
 if __name__ == "__main__":
     __salt__ = ''
     __opts__ = ''
