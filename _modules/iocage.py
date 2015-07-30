@@ -66,6 +66,7 @@ def _parse_properties(**kwargs):
     argument
     '''
     default_properties = [p.split('=')[0] for p in _list_properties('defaults')]
+    default_properties.append('pkglist')
 
     for prop in kwargs.keys():
         if not prop.startswith('__') and prop not in default_properties:
