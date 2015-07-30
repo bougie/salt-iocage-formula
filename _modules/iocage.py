@@ -72,7 +72,7 @@ def _parse_properties(**kwargs):
             raise SaltInvocationError('Unknown property %s' % (prop,))
 
     return ' '.join(
-        ['%s=%s' % (k, v) for k, v in kwargs.items() if not k.startswith('__')])
+        ['%s="%s"' % (k, v) for k, v in kwargs.items() if not k.startswith('__')])
 
 
 def _list(option=None, **kwargs):
