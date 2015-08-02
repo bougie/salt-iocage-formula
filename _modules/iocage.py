@@ -66,13 +66,14 @@ def _parse_properties(**kwargs):
     argument
     '''
     default_properties = [p.split('=')[0] for p in _list_properties('defaults')]
+    default_properties.append('pkglist')
 
     for prop in kwargs.keys():
         if not prop.startswith('__') and prop not in default_properties:
             raise SaltInvocationError('Unknown property %s' % (prop,))
 
     return ' '.join(
-        ['%s=%s' % (k, v) for k, v in kwargs.items() if not k.startswith('__')])
+        ['%s="%s"' % (k, v) for k, v in kwargs.items() if not k.startswith('__')])
 
 
 def _list(option=None, **kwargs):

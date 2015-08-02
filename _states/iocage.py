@@ -71,6 +71,8 @@ def managed(name, properties=None, **kwargs):
         jail_exists = False
 
         jails = __salt__['iocage.list_jails']().split('\n')
+        templates = __salt__['iocage.list_templates']().split('\n')
+        jails = jails + templates
         for jail in jails:
             jail_datas = {j.split('=')[0]: '='.join(j.split('=')[1:])
                           for j in jail.split(',')}
