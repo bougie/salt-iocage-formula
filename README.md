@@ -1,6 +1,4 @@
-=======
-iocage
-=======
+# iocage
 
 Install iocage and install FreeBSD jails with it.
 
@@ -9,16 +7,12 @@ Install iocage and install FreeBSD jails with it.
     See the full `Salt Formulas installation and usage instructions
     <http://docs.saltstack.com/en/latest/topics/development/conventions/formulas.html>`_.
 
-Available modules
-=================
+# Available modules
 
 .. contents::
     :local:
 
-``iocage``
----------
-
-Manage freebsd jails:
+# Manage freebsd jails
 
 - fetch a release
 - create a jail
@@ -30,7 +24,7 @@ Manage freebsd jails:
 # Usage
 The main keys are name, properties, jail_type and template_id.
 
-```
+```yaml
 iocage_test_jail:
   iocage.managed:
     - name: test_jail
@@ -44,15 +38,15 @@ iocage_test_jail:
 
 ### name
 
-The name property is the tag that is used to create the field. This is a required field.
+The name property is the tag that is used to create the jail. This is a required field.
 
 ### properties
 
-A list of key value pairs. All properties listed in `iocage defaults` can be set here. Also pkglist key can be set here.
+A list of key value pairs. All properties listed in `iocage defaults` can be set here. Also the pkglist property can be set here.
 
 ### jail_type
 
-The jail_type of jail. Can be one of full , clone (-c), base (-b), template-clone, empty (-e). To create a template jail, just set 'template=yes' in properties.
+The type of jail to create.. Can be one of full , clone (-c), base (-b), template-clone, empty (-e). To create a template jail, just set 'template=yes' in properties. Default is full
 
 ### template_id:
 
@@ -62,14 +56,14 @@ If the jail jail_type is template clone, then the template to be cloned is defin
 # Examples
 
 Create a full jail with default properties:
-```
+```yaml
 iocage_test_jail:
   iocage.managed:
     - name: test_jail
 ```
 
 Create a full jail with some properties set:
-```
+```yaml
 iocage_test_jail:
   iocage.managed:
     - name: test_jail
@@ -78,7 +72,7 @@ iocage_test_jail:
 ```
 
 Create a cloned jail:
-```
+```yaml
 iocage_test_jail:
   iocage.managed:
     - name: test_jail
@@ -88,7 +82,7 @@ iocage_test_jail:
 ```
 
 Create a template jail:
-```
+```yaml
 iocage_test_jail:
   iocage.managed:
     - name: test_jail
@@ -99,7 +93,7 @@ iocage_test_jail:
 ```
 
 Clone a template. This will clone the template with tag test_template
-```
+```yaml
 iocage_test_jail:
   iocage.managed:
     - name: test_jail
