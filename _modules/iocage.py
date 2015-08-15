@@ -257,7 +257,7 @@ def fetch(release=None, **kwargs):
         return _exec('iocage fetch release=%s' % (release,))
 
 
-def create(option=None, **kwargs):
+def create(jail_type="full", template_id=None, **kwargs):
     '''
     Create a new jail
 
@@ -267,10 +267,26 @@ def create(option=None, **kwargs):
 
         salt '*' iocage.create [<option>] [<property=value>]
     '''
-    _options = [None, 'clone', 'base']
+    _options = ['full', 'clone', 'base', 'empty', 'template-clone']
 
-    if option not in _options:
-        raise SaltInvocationError('Unknown option %s' % (option,))
+    if jail_type not in _options:
+        raise SaltInvocationError('Unknown option %s' % (jail_type,))
+
+    # check template exists for cloned template
+    if jail_type == 'template-clone':
+        if template_id == None:
+            raise SaltInvocationError('template_id not specified for cloned template')
+        templates = __salt__['iocage.list_templates']().split('\n')
+        tmpl_exists = False
+        for tmpl in templates:
+            tmpl_datas = {t.split('=')[0]: '='.join(t.split('=')[1:])
+                          for t in tmpl.split(',')}
+            if tmpl_datas['TAG'] == template_id or tmpl_datas['UUID'] == template_id:
+                tmpl_exists = True
+                break
+        if tmpl_exists == False:
+            raise SaltInvocationError('Template id %s does not exist' % (template_id,))
+
 
     # stringify the kwargs dict into iocage create properties format
     properties = _parse_properties(**kwargs)
@@ -283,13 +299,23 @@ def create(option=None, **kwargs):
             raise SaltInvocationError(
                 'Tag %s already exists' % (kwargs['tag'],))
 
+    pre_cmd = 'iocage create'
+    if jail_type == 'clone':
+        pre_cmd = 'iocage create -c'
+    if jail_type == 'base':
+        pre_cmd = 'iocage create -b'
+    if jail_type == 'empty':
+        pre_cmd = 'iocage create -e'
+    if jail_type == 'template-clone':
+        pre_cmd = 'iocage clone %s' % (template_id)
+
     # fetch a release if it's the first install
     existing_release = list_releases()
     if len(existing_release) == 0:
         fetch()
 
-    if option is not None and len(properties) > 0:
-        cmd = 'iocage create %s %s' % (option, properties)
+    if len(properties) > 0:
+        cmd = '%s %s' % (pre_cmd, properties)
     else:
         cmd = 'iocage create %s' % (properties,)
     return _exec(cmd)

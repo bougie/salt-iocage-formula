@@ -3,7 +3,8 @@
 Support for iocage (jails tools on FreeBSD)
 '''
 from __future__ import absolute_import
-
+import logging
+log = logging.getLogger(__name__)
 
 def _property(name, value, jail, **kwargs):
     ret = {'name': name,
@@ -59,7 +60,7 @@ def property(name, value, jail=None, **kwargs):
         return _property(name, value, jail, **kwargs)
 
 
-def managed(name, properties=None, **kwargs):
+def managed(name, properties=None, jail_type="full", template_id=None, **kwargs):
     ret = {'name': name,
            'changes': {},
            'comment': '',
@@ -133,10 +134,11 @@ def managed(name, properties=None, **kwargs):
                 try:
                     if not __opts__['test']:
                         if properties is not None:
-                            __salt__['iocage.create'](tag=name, **properties)
+                            __salt__['iocage.create'](tag=name, jail_type=jail_type, template_id=template_id, **properties)
                         else:
                             __salt__['iocage.create'](tag=name, **kwargs)
-                except:
+                except e:
+                    log.debug(e)
                     ret['result'] = False
                     ret['comment'] = 'fail installing new jail %s' % (name,)
                 else:
