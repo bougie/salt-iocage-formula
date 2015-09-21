@@ -317,7 +317,7 @@ def create(jail_type="full", template_id=None, **kwargs):
 
     # fetch a specifc release if not present
     if 'release' in kwargs.keys():
-        if kwargs['release'] in existing_release:
+        if kwargs['release'] not in existing_release:
             fetch(release=kwargs['release'])
 
     if len(properties) > 0:
