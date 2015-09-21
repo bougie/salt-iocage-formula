@@ -75,12 +75,17 @@ def managed(name, properties=None, jail_type="full", template_id=None, **kwargs)
         templates = __salt__['iocage.list_templates']().split('\n')
         jails = jails + templates
         for jail in jails:
+            # check if the jails or templates list is empty which results in an empty string in the array
+            if not jail:
+                continue
             jail_datas = {j.split('=')[0]: '='.join(j.split('=')[1:])
                           for j in jail.split(',')}
             if jail_datas['TAG'] == name or jail_datas['UUID'] == name:
                 jail_exists = True
                 break
-    except:
+    except Exception as e:
+        log.debug("########## UNABLE TO CHECK IF JAIL EXISTS OR NOT ")
+        log.debug(e)
         if __opts__['test']:
             ret['result'] = None
         ret['comment'] = 'unable to check if jail exists or not'
@@ -137,7 +142,8 @@ def managed(name, properties=None, jail_type="full", template_id=None, **kwargs)
                             __salt__['iocage.create'](tag=name, jail_type=jail_type, template_id=template_id, **properties)
                         else:
                             __salt__['iocage.create'](tag=name, **kwargs)
-                except e:
+                except Exception as e:
+                    log.debug('####### FAIL INSTALLING NEW JAIL')
                     log.debug(e)
                     ret['result'] = False
                     ret['comment'] = 'fail installing new jail %s' % (name,)
