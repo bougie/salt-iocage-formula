@@ -252,7 +252,8 @@ def fetch(release=None, **kwargs):
         salt '*' iocage.fetch <release>
     '''
     if release is None:
-        return _exec('iocage fetch')
+        current_release = _exec('uname -r').strip()
+        return _exec('iocage fetch release=%s' % (current_release,))
     else:
         return _exec('iocage fetch release=%s' % (release,))
 
@@ -313,6 +314,11 @@ def create(jail_type="full", template_id=None, **kwargs):
     existing_release = list_releases()
     if len(existing_release) == 0:
         fetch()
+
+    # fetch a specifc release if not present
+    if 'release' in kwargs.keys():
+        if kwargs['release'] in existing_release:
+            fetch(release=kwargs['release'])
 
     if len(properties) > 0:
         cmd = '%s %s' % (pre_cmd, properties)
