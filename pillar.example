@@ -4,3 +4,8 @@ iocage:
     jails:
         <jail_tagname>:
             <property_name>: <property_value>
+        <jail_name2>:
+            jail_type: template-clone
+            template_id: test_template
+            properties:
+                <property_name>: <property_value>

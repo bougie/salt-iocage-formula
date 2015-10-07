@@ -14,9 +14,21 @@ iocage_{{property_name}}_default_property:
 iocage_{{jail_name}}_jail:
     iocage.managed:
         - name: {{jail_name}}
+        {% if 'properties' in properties.keys() %}
+            {% for option_name, option_value in properties.items() %}
+                {% if option_name != 'properties' %}
+        - {{option_name}}: "{{option_value}}"
+                {% endif %}
+            {% endfor %}
         - properties:
-        {% for property_name, property_value in properties.items() %}
+            {% for property_name, property_value in properties.properties.items() %}
             {{property_name}}: "{{property_value}}"
-        {% endfor %}
+            {% endfor %}
+        {% else %}
+        - properties:
+            {% for property_name, property_value in properties.items() %}
+            {{property_name}}: "{{property_value}}"
+            {% endfor %}
+        {% endif %}
     {% endfor %}
 {% endif %}
