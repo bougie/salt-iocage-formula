@@ -20,13 +20,13 @@ The main keys are **name**, **properties**, **jail_type** and **template_id**.
 ```yaml
 iocage_test_jail:
     iocage.managed:
-        name: test_jail
-        properties:
+        - name: test_jail
+        - properties:
             ip4_addr:lo1|10.1.1.20/32
         # optional default is full
-        jail_type: full
+        - jail_type: full
         # required only if jail_type is template-clone
-        template_id: ""
+        - template_id: ""
 ```
 
 - **name** : the name property is the tag that is used to create the jail. This is a required field.
@@ -42,15 +42,15 @@ Create a full jail with default properties:
 ```yaml
 iocage_test_jail:
     iocage.managed:
-        name: test_jail
+        - name: test_jail
 ```
 
 Create a full jail with some properties set:
 ```yaml
 iocage_test_jail:
     iocage.managed:
-        name: test_jail
-        properties:
+        - name: test_jail
+        - properties:
             ip4_addr: lo1|10.1.1.20/32
 ```
 
@@ -60,9 +60,9 @@ Create a cloned jail:
 ```yaml
 iocage_test_jail:
     iocage.managed:
-        name: test_jail
-        jail_type: clone
-        properties:
+        - name: test_jail
+        - jail_type: clone
+        - properties:
             ip4_addr: lo1|10.1.1.20/32
 ```
 
@@ -72,20 +72,20 @@ Create a template jail:
 ```yaml
 iocage_test_jail:
     iocage.managed:
-        name: test_jail
-        properties:
+        - name: test_jail
+        - properties:
             ip4_addr: lo1|10.1.1.20/32
         # note the quotes for yes. Without it yaml parses it as true
-        template: "yes"
+        - template: "yes"
 ```
 
 Clone a template. This will clone the template with tag test_template
 ```yaml
 iocage_test_jail:
     iocage.managed:
-        name: test_jail
-        jail_type: template-clone
-        template_id: test_template
-        properties:
+        - name: test_jail
+        - jail_type: template-clone
+        - template_id: test_template
+        - properties:
             ip4_addr: lo1|10.1.1.20/32
 ```
