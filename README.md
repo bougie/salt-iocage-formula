@@ -85,7 +85,7 @@ iocage_test_jail:
     iocage.managed:
         name: test_jail
         jail_type: template-clone
-        template-id: test_template
+        template_id: test_template
         properties:
             ip4_addr: lo1|10.1.1.20/32
 ```
