@@ -99,6 +99,9 @@ def _list(option=None, **kwargs):
         jails = []
         if len(lines) > 1:
             for l in lines[1:]:
+                # omit all non-iocage jails
+                if l == '--- non iocage jails currently active ---':
+                    break
                 jails.append({
                     headers[k]: v for k, v in enumerate([_ for _ in l.split(' ')
                                                          if len(_) > 0])
