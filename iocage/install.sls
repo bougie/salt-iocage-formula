@@ -1,3 +1,3 @@
 iocage_package:
     pkg.installed:
-        - name: iocage
+        - name: py36-iocage
